@@ -6,4 +6,6 @@ For now :</br>
 
 <>/br
 
-Greatly inspired by https://github.com/RedCursorSecurityConsulting/PPLKiller .
+Greatly inspired by https://github.com/RedCursorSecurityConsulting/PPLKiller </br>
+
+Tools to check eprocess struct : https://ntdiff.github.io/ </br>
