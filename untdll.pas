@@ -118,7 +118,6 @@ newth:=thandle(-1);
 th:=0 ;
 result:=false;
 ret:=NtGetNextProcess(th ,MAXIMUM_ALLOWED ,0,0,newth); //THREAD_ALL_ACCESS  THREAD_QUERY_INFORMATION MAXIMUM_ALLOWED
-//writeln(newth);
 //if ret<>0 then writeln(inttohex(ret,sizeof(ret)));
 if ret<>0 then exit;
 GetProcessId :=GetProcAddress (loadlibrary('kernel32.dll'),'GetProcessId');
