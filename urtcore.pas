@@ -39,11 +39,13 @@ var
      MemoryRead:RTCORE64_MEMORY_READ;
         BytesReturned:DWORD=0;
 begin
+    fillchar(MemoryRead,sizeof(MemoryRead),0);
     MemoryRead.Address := Address;
     MemoryRead.ReadSize := Size;
     MemoryRead.Value := Value;
 
-
+    //writeln('MemoryRead.Address :=' + inttohex(Address,sizeof(address)));
+    //writeln('MemoryRead.ReadSize :=' + inttostr(Size));
 
     result:=DeviceIoControl(Device,
         RTCORE64_MEMORY_WRITE_CODE,

