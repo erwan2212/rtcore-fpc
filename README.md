@@ -1,10 +1,10 @@
 # rtcore-fpc
-Playing with unsecured driver(s) allowing read/write to kernel memory.</br>
-For now :</br>
+Playing with unsecured driver(s) allowing read/write to kernel memory.</br></br>
+For now, playing with EPROCESS :</br>
 -removing PPL flag</br>
 -stealing system token</br>
 
-<>/br
+</br>
 
 Greatly inspired by https://github.com/RedCursorSecurityConsulting/PPLKiller </br>
 
