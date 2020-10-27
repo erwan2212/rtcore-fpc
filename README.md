@@ -14,10 +14,10 @@ memRW.exe unload %cd%\rtcore64.sys</br>
 
 Greatly inspired by https://github.com/RedCursorSecurityConsulting/PPLKiller </br>
 
-Tools to check eprocess struct : https://ntdiff.github.io/ </br>
+Tools to check EPROCESS struct : https://ntdiff.github.io/ </br>
 
-Must read : https://posts.specterops.io/mimidrv-in-depth-4d273d19e148 </br>
-
-Details EPROCESS struc : https://www.geoffchappell.com/studies/windows/km/ntoskrnl/structs/eprocess/index.htm </br>
+Detailed EPROCESS struc : https://www.geoffchappell.com/studies/windows/km/ntoskrnl/structs/eprocess/index.htm </br>
 
 Bunch of other drivers to look at : https://guidedhacking.com/threads/how-to-bypass-kernel-anticheat-develop-drivers.11325/ </br>
+
+Must read (mimikatz 4 ever...) : https://posts.specterops.io/mimidrv-in-depth-4d273d19e148 </br>
