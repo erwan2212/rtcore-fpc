@@ -5,7 +5,7 @@ unit urtcore;
 interface
 
 uses
-  windows, SysUtils;
+  windows,sysutils;
 
 
 function WriteMemoryPrimitive( Device:HANDLE;  Size:DWORD;  Address:DWORD64;  Value:DWORD):boolean;

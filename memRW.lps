@@ -50,6 +50,11 @@
             <IncludeFiles Value="$(ProjOutDir)"/>
             <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
           </SearchPaths>
+          <Parsing>
+            <SyntaxOptions>
+              <SyntaxMode Value="Delphi"/>
+            </SyntaxOptions>
+          </Parsing>
           <CodeGeneration>
             <SmartLinkUnit Value="True"/>
             <TargetCPU Value="x86_64"/>
@@ -67,40 +72,41 @@
         </CompilerOptions>
       </Item2>
     </BuildModes>
-    <Units Count="8">
+    <Units Count="10">
       <Unit0>
         <Filename Value="memRW.lpr"/>
         <IsPartOfProject Value="True"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="122"/>
-        <CursorPos X="91" Y="136"/>
-        <UsageCount Value="167"/>
+        <TopLine Value="61"/>
+        <CursorPos Y="86"/>
+        <UsageCount Value="177"/>
         <Loaded Value="True"/>
       </Unit0>
       <Unit1>
         <Filename Value="udrv.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="3"/>
-        <CursorPos X="10" Y="8"/>
-        <UsageCount Value="95"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="41"/>
+        <CursorPos X="31" Y="59"/>
+        <UsageCount Value="105"/>
         <Loaded Value="True"/>
       </Unit1>
       <Unit2>
         <Filename Value="urtcore.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="2"/>
-        <TopLine Value="4"/>
-        <CursorPos X="39" Y="48"/>
-        <UsageCount Value="71"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="101"/>
+        <CursorPos X="19" Y="8"/>
+        <UsageCount Value="81"/>
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
         <Filename Value="untdll.pas"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="1"/>
-        <TopLine Value="125"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="119"/>
         <CursorPos X="33" Y="120"/>
-        <UsageCount Value="71"/>
+        <UsageCount Value="81"/>
         <Loaded Value="True"/>
       </Unit3>
       <Unit4>
@@ -108,150 +114,169 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="489"/>
         <CursorPos X="19" Y="502"/>
-        <UsageCount Value="29"/>
+        <UsageCount Value="28"/>
       </Unit4>
       <Unit5>
         <Filename Value="C:\FPC\3.0.0\source\rtl\win\wininc\struct.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="3609"/>
         <CursorPos X="6" Y="3623"/>
-        <UsageCount Value="29"/>
+        <UsageCount Value="28"/>
       </Unit5>
       <Unit6>
         <Filename Value="C:\lazarus\fpc\3.2.0\source\rtl\win\wininc\defines.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="1161"/>
         <CursorPos X="39" Y="1178"/>
-        <UsageCount Value="9"/>
+        <UsageCount Value="8"/>
       </Unit6>
       <Unit7>
         <Filename Value="C:\lazarus\fpc\3.2.0\source\rtl\win\wininc\redef.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="803"/>
         <CursorPos X="2" Y="816"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="6"/>
       </Unit7>
+      <Unit8>
+        <Filename Value="urtcore_utils.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="2"/>
+        <CursorPos X="23" Y="8"/>
+        <UsageCount Value="22"/>
+        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="uutils.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="10"/>
+        <CursorPos X="69" Y="22"/>
+        <UsageCount Value="21"/>
+        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit9>
     </Units>
     <JumpHistory Count="30" HistoryIndex="29">
       <Position1>
         <Filename Value="memRW.lpr"/>
-        <Caret Line="227" Column="22" TopLine="208"/>
+        <Caret Line="288" Column="9" TopLine="271"/>
       </Position1>
       <Position2>
         <Filename Value="memRW.lpr"/>
-        <Caret Line="128" Column="16" TopLine="125"/>
+        <Caret Line="292" TopLine="272"/>
       </Position2>
       <Position3>
         <Filename Value="memRW.lpr"/>
-        <Caret Line="129" Column="54" TopLine="125"/>
+        <Caret Line="270" Column="35" TopLine="283"/>
       </Position3>
       <Position4>
         <Filename Value="memRW.lpr"/>
-        <Caret Line="206" Column="96" TopLine="124"/>
+        <Caret Line="293" Column="22" TopLine="275"/>
       </Position4>
       <Position5>
         <Filename Value="memRW.lpr"/>
-        <Caret Line="224" Column="82" TopLine="212"/>
+        <Caret Line="150" Column="31" TopLine="128"/>
       </Position5>
       <Position6>
         <Filename Value="memRW.lpr"/>
-        <Caret Line="225" Column="34" TopLine="210"/>
+        <Caret Line="145" Column="57" TopLine="131"/>
       </Position6>
       <Position7>
         <Filename Value="memRW.lpr"/>
-        <Caret Line="145" Column="28" TopLine="123"/>
+        <Caret Line="139" Column="28" TopLine="126"/>
       </Position7>
       <Position8>
         <Filename Value="memRW.lpr"/>
-        <Caret Line="206" Column="6" TopLine="129"/>
+        <Caret Line="138" TopLine="133"/>
       </Position8>
       <Position9>
-        <Filename Value="urtcore.pas"/>
-        <Caret Line="47" Column="7" TopLine="31"/>
+        <Filename Value="memRW.lpr"/>
+        <Caret Line="324" Column="67" TopLine="304"/>
       </Position9>
       <Position10>
         <Filename Value="memRW.lpr"/>
-        <Caret Line="92" Column="19" TopLine="79"/>
+        <Caret Line="180" TopLine="162"/>
       </Position10>
       <Position11>
         <Filename Value="memRW.lpr"/>
-        <Caret Line="126" Column="34" TopLine="112"/>
+        <Caret Line="165" TopLine="152"/>
       </Position11>
       <Position12>
         <Filename Value="memRW.lpr"/>
-        <Caret Line="127" Column="63" TopLine="113"/>
+        <Caret Line="169" Column="42" TopLine="158"/>
       </Position12>
       <Position13>
         <Filename Value="memRW.lpr"/>
-        <Caret Line="133" Column="45" TopLine="114"/>
+        <Caret Line="180" Column="24" TopLine="160"/>
       </Position13>
       <Position14>
         <Filename Value="memRW.lpr"/>
-        <Caret Line="146" Column="60" TopLine="132"/>
+        <Caret Line="184" TopLine="293"/>
       </Position14>
       <Position15>
         <Filename Value="memRW.lpr"/>
-        <Caret Line="155" Column="79" TopLine="141"/>
+        <Caret Line="118" Column="73" TopLine="105"/>
       </Position15>
       <Position16>
         <Filename Value="memRW.lpr"/>
-        <Caret Line="158" Column="53" TopLine="144"/>
+        <Caret Line="121" TopLine="171"/>
       </Position16>
       <Position17>
         <Filename Value="memRW.lpr"/>
-        <Caret Line="124" Column="66" TopLine="111"/>
+        <Caret Line="371" Column="29" TopLine="345"/>
       </Position17>
       <Position18>
         <Filename Value="memRW.lpr"/>
-        <Caret Line="8" Column="47"/>
+        <Caret Line="201" Column="21" TopLine="196"/>
       </Position18>
       <Position19>
         <Filename Value="memRW.lpr"/>
-        <Caret Line="113" Column="99" TopLine="99"/>
+        <Caret Line="5" Column="53"/>
       </Position19>
       <Position20>
-        <Filename Value="memRW.lpr"/>
-        <Caret Line="118" Column="101" TopLine="104"/>
+        <Filename Value="urtcore_utils.pas"/>
+        <Caret Line="10" Column="45"/>
       </Position20>
       <Position21>
-        <Filename Value="memRW.lpr"/>
-        <Caret Line="126" Column="60" TopLine="112"/>
+        <Filename Value="urtcore_utils.pas"/>
+        <Caret Line="8" Column="24"/>
       </Position21>
       <Position22>
-        <Filename Value="memRW.lpr"/>
-        <Caret Line="133" Column="63" TopLine="114"/>
+        <Filename Value="urtcore_utils.pas"/>
+        <Caret Line="35" Column="5" TopLine="7"/>
       </Position22>
       <Position23>
-        <Filename Value="memRW.lpr"/>
-        <Caret Line="146" Column="86" TopLine="132"/>
+        <Filename Value="urtcore_utils.pas"/>
+        <Caret Line="15" TopLine="5"/>
       </Position23>
       <Position24>
-        <Filename Value="memRW.lpr"/>
-        <Caret Line="158" Column="79" TopLine="141"/>
+        <Filename Value="urtcore_utils.pas"/>
+        <Caret Line="8" Column="28"/>
       </Position24>
       <Position25>
-        <Filename Value="memRW.lpr"/>
-        <Caret Line="209" Column="25" TopLine="184"/>
+        <Filename Value="uutils.pas"/>
+        <Caret Line="8" Column="10"/>
       </Position25>
       <Position26>
-        <Filename Value="memRW.lpr"/>
-        <Caret Line="226" Column="51" TopLine="212"/>
+        <Filename Value="uutils.pas"/>
+        <Caret Line="20" Column="34" TopLine="7"/>
       </Position26>
       <Position27>
-        <Filename Value="memRW.lpr"/>
-        <Caret Line="96" Column="22" TopLine="84"/>
+        <Filename Value="urtcore_utils.pas"/>
+        <Caret Line="8" Column="39"/>
       </Position27>
       <Position28>
         <Filename Value="memRW.lpr"/>
-        <Caret Line="135" Column="48" TopLine="115"/>
+        <Caret Line="48" TopLine="29"/>
       </Position28>
       <Position29>
         <Filename Value="memRW.lpr"/>
-        <Caret Line="144" Column="63" TopLine="130"/>
+        <Caret Line="10" Column="8"/>
       </Position29>
       <Position30>
-        <Filename Value="memRW.lpr"/>
-        <Caret Line="136" Column="91" TopLine="120"/>
+        <Filename Value="udrv.pas"/>
+        <Caret Line="8" Column="10"/>
       </Position30>
     </JumpHistory>
   </ProjectSession>

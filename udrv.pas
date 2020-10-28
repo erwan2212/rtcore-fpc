@@ -5,7 +5,7 @@ unit udrv;
 interface
 
 uses
-  windows, SysUtils;
+  windows,sysutils;
 
 function LoadDriver(szDriverPath:string;szDriverSvc  :string= '_driver'):boolean;
 function UnloadDriver(szDriverSvc  :string= '_driver'):boolean;
@@ -20,7 +20,8 @@ var
   boolRetVal  :BOOL = FALSE;
 
 begin
-
+  writeln('LoadDriver');
+  if szDriverPath='' then exit;
   //szDriverSvc = ExtractService(szDriverPath);
   ServiceMan  := OpenSCManager(nil, nil, SC_MANAGER_CREATE_SERVICE);
   if ServiceMan <> thandle(-1) then
@@ -55,6 +56,7 @@ var
   ServiceStat  :SERVICE_STATUS ;
 
 begin
+  if szDriverSvc='' then exit;
   fillchar(ServiceStat,sizeof(ServiceStat),0);
   ServiceMan  := OpenSCManager(nil, nil, SC_MANAGER_CREATE_SERVICE);
   if ServiceMan <> thandle(-1) then
