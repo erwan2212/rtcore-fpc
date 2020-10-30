@@ -13,8 +13,6 @@ memRW.exe stealtoken from_pid to_pid</br>
 memRW.exe unload "%cd%\rtcore64.sys"</br>
 </br>
 
-Hint : stealtoken from trustedinstaller.exe (net start) and taskkill /f /im msmpeng.exe.
-
 Greatly inspired by https://github.com/RedCursorSecurityConsulting/PPLKiller </br>
 
 Tools to check EPROCESS struct : https://ntdiff.github.io/ </br>
