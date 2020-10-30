@@ -44,6 +44,7 @@ _PS_PROTECTED_TYPE=
 
 var
 targetpid:dword64=0;
+sourcepid:dword=0;
 
 
 //https://guidedhacking.com/threads/how-to-bypass-kernel-anticheat-develop-drivers.11325/
@@ -86,5 +87,19 @@ if (paramcount =2) and (paramstr(1)='makesystem') then
   if StealToken(4,targetpid)=false then writeln('RemovePPL failed');
   end;
 
+if (paramcount =3) and (paramstr(1)='stealtoken') then
+  begin
+  sourcepid:=strtoint64(ParamStr(2));
+  targetpid:=strtoint64(ParamStr(3));
+  if StealToken(sourcepid,targetpid)=false then writeln('RemovePPL failed');
+  end;
+
 end.
 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

