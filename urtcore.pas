@@ -89,7 +89,7 @@ end;
 
 function ReadMemoryByte( Device:HANDLE;  Address:DWORD64):Byte;
 begin
-    result:= ReadMemoryPrimitive(Device, 1, Address) and $FFffff;
+    result:= ReadMemoryPrimitive(Device, 1, Address) and $ffffff;
 end;
 
 function ReadMemoryWORD( Device:HANDLE;  Address:DWORD64):WORD;

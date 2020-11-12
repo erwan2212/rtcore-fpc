@@ -48,6 +48,8 @@ sourcepid:dword=0;
 
 
 //https://guidedhacking.com/threads/how-to-bypass-kernel-anticheat-develop-drivers.11325/
+//https://github.com/eclypsium/Screwed-Drivers/blob/master/DRIVERS.md
+//https://github.com/br-sn/CheekyBlinder
 begin
 if paramcount=0 then exit;
 //
