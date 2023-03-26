@@ -59,6 +59,7 @@ begin
  1903:begin    nextFlink :=$02f0;SignatureProtect :=$06f8; Token :=$360; ImageFileName :=$450; end;
  1909:begin    nextFlink :=$02f0;SignatureProtect :=$06f8; Token :=$360; ImageFileName :=$450; end;
  2004:begin    nextFlink :=$0448;SignatureProtect :=$0878; Token :=$4b8; ImageFileName :=$5a8; end;
+ 2009:begin    nextFlink :=$0448;SignatureProtect :=$0878; Token :=$4b8; ImageFileName :=$5a8; end;
  //20H2:begin    EprocessNext :=$0448;SignatureProtect :=$0878; Token :=$4b8; end;
  //21H1:begin    EprocessNext :=$0448;SignatureProtect :=$0878; Token :=$4b8; end;
  else result:=false;

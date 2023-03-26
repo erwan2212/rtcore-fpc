@@ -86,7 +86,7 @@ if (paramcount =2) and (paramstr(1)='removeppl') then
 if (paramcount =2) and (paramstr(1)='makesystem') then
   begin
   targetpid:=strtoint64(ParamStr(2));
-  if StealToken(4,targetpid)=false then writeln('RemovePPL failed');
+  if StealToken(4,targetpid)=false then writeln('makesystem failed');
   end;
 
 if (paramcount =3) and (paramstr(1)='stealtoken') then

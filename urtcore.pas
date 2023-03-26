@@ -21,6 +21,12 @@ function ReadMemory16bytes( Device:HANDLE;  Address:DWORD64):string;
 
 implementation
 
+type RTCORE64_MSR_READ =record
+  Register_:DWORD;
+  ValueHigh:DWORD;
+  ValueLow:DWORD;
+  end;
+
 type  RTCORE64_MEMORY_READ=record
    Pad0:array[0..7] of byte;
    Address:DWORD64;
@@ -33,6 +39,15 @@ end;
 const  RTCORE64_MSR_READ_CODE = $80002030;
 const  RTCORE64_MEMORY_READ_CODE = $80002048;
 const  RTCORE64_MEMORY_WRITE_CODE = $8000204c;
+
+{
+  #define IOCTL_MSRREAD		0x80002030
+  #define IOCTL_MSRWRITE		0x80002034
+  #define IOCTL_MAPIOSPACE	0x80002040
+  #define IOCTL_UNMAPIOSPACE	0x80002044
+  #define IOCTL_MEMREAD		0x80002048
+  #define IOCTL_MEMWRITE		0x8000204C
+}
 
 function WriteMemoryPrimitive( Device:HANDLE;  Size:DWORD;  Address:DWORD64;  Value:DWORD):boolean;
 var
